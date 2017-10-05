@@ -16,4 +16,6 @@ public interface DWTService {
 	float[][][] encodeViaDWT(BufferedImage inputImg, InputModel inputModel);
 
 	float[][][] decodeViaDWT(float[][][] colorMatrix, InputModel inputModel);
+
+	BufferedImage getDecodedImage(float[][][] decodedBlock);
 }

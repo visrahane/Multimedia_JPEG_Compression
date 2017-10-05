@@ -30,9 +30,10 @@ public class Starter {
 		DWTService dwtService = new DWTServiceImpl();
 		float[][][] encodedBlock=dwtService.encodeViaDWT(inputImg,inputModel);
 		float[][][] decodedBlock = dwtService.decodeViaDWT(encodedBlock, inputModel);
+		BufferedImage dwtOutput = dwtService.getDecodedImage(decodedBlock);
 		// Use a panel and label to display the image
 		displayImage(inputImg);
-		// displayImage(outputImg);
+		displayImage(dwtOutput);
 
 	}
 
