@@ -13,9 +13,10 @@ import com.vis.models.InputModel;
  *
  */
 public interface DWTService {
-	float[][][] encodeViaDWT(BufferedImage inputImg, InputModel inputModel);
 
-	float[][][] decodeViaDWT(float[][][] colorMatrix, InputModel inputModel);
+	float[][][] encode(BufferedImage inputImg, InputModel inputModel);
+
+	float[][][] decode(float[][][] colorMatrix, InputModel inputModel);
 
 	BufferedImage getDecodedImage(float[][][] decodedBlock);
 }

@@ -3,10 +3,10 @@
  */
 package com.vis.services;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import com.vis.models.InputModel;
+import com.vis.util.CompressionUtil;
 
 /**
  * @author Vis
@@ -15,9 +15,8 @@ import com.vis.models.InputModel;
 public class DWTServiceImpl implements DWTService {
 
 	@Override
-	public float[][][] encodeViaDWT(BufferedImage inputImg, InputModel inputModel) {
-		// TODO Auto-generated method stub
-		float[][][] colorBlock = prepareColorBlock(inputImg);
+	public float[][][] encode(BufferedImage inputImg, InputModel inputModel) {
+		float[][][] colorBlock = CompressionUtil.prepareColorBlock(inputImg);
 		colorBlock = encodeBlock(colorBlock);
 		colorBlock = updateCoefficients(colorBlock, inputModel.getNoOfCoefficient());
 		return colorBlock;
@@ -93,7 +92,7 @@ public class DWTServiceImpl implements DWTService {
 
 	public float[][][] encodeOnRows(float[][][] colorBlock, int size) {
 		float[][][] dwtProcessedBlock = new float[3][colorBlock[0].length][colorBlock[0][0].length];
-		clone3DArray(colorBlock, dwtProcessedBlock);
+		CompressionUtil.clone3DArray(colorBlock, dwtProcessedBlock);
 
 		for (int i = 0; i < colorBlock.length; i++) {
 			for (int k = 0; k < colorBlock[0][0].length; k++) {
@@ -115,17 +114,9 @@ public class DWTServiceImpl implements DWTService {
 		return dwtProcessedBlock;
 	}
 
-	public static void clone3DArray(float[][][] colorBlock, float[][][] dwtProcessedBlock) {
-		for (int i = 0; i < colorBlock.length; i++) {
-			for (int j = 0; j < colorBlock[0].length; j++) {
-				dwtProcessedBlock[i][j] = colorBlock[i][j].clone();
-			}
-		}
-	}
-
 	public float[][][] encodeOnCols(float[][][] colorBlock, int size) {
 		float[][][] dwtProcessedBlock = new float[3][colorBlock[0].length][colorBlock[0][0].length];
-		clone3DArray(colorBlock, dwtProcessedBlock);
+		CompressionUtil.clone3DArray(colorBlock, dwtProcessedBlock);
 
 		for(int i=0;i<colorBlock.length;i++){
 			for (int j = 0; j < colorBlock[0].length; j++) {
@@ -149,7 +140,7 @@ public class DWTServiceImpl implements DWTService {
 
 	public float[][][] decodeOnCols(float[][][] colorBlock, int size) {
 		float[][][] dwtProcessedBlock = new float[3][colorBlock[0].length][colorBlock[0][0].length];
-		clone3DArray(colorBlock, dwtProcessedBlock);
+		CompressionUtil.clone3DArray(colorBlock, dwtProcessedBlock);
 
 		for (int i = 0; i < colorBlock.length; i++) {
 			for (int j = 0; j < colorBlock[0].length; j++) {
@@ -172,7 +163,7 @@ public class DWTServiceImpl implements DWTService {
 
 	public float[][][] decodeOnRows(float[][][] colorBlock, int size) {
 		float[][][] dwtProcessedBlock = new float[3][colorBlock[0].length][colorBlock[0][0].length];
-		clone3DArray(colorBlock, dwtProcessedBlock);
+		CompressionUtil.clone3DArray(colorBlock, dwtProcessedBlock);
 
 		for (int i = 0; i < colorBlock.length; i++) {
 			for (int k = 0; k < colorBlock[0][0].length; k++) {
@@ -193,21 +184,8 @@ public class DWTServiceImpl implements DWTService {
 		return dwtProcessedBlock;
 	}
 
-	private float[][][] prepareColorBlock(BufferedImage inputImg) {
-		float block[][][] = new float[3][inputImg.getHeight()][inputImg.getWidth()];
-		for (int y = 0; y < inputImg.getHeight(); y++) {
-			for (int x = 0; x < inputImg.getWidth(); x++) {
-				Color c = new Color(inputImg.getRGB(x, y));
-				block[0][y][x] = c.getRed();
-				block[1][y][x] = c.getGreen();
-				block[2][y][x] = c.getBlue();
-			}
-		}
-		return block;
-	}
-
 	@Override
-	public float[][][] decodeViaDWT(float[][][] colorBlock, InputModel inputModel) {
+	public float[][][] decode(float[][][] colorBlock, InputModel inputModel) {
 		// TODO Auto-generated method stub
 		colorBlock = decodeBlock(colorBlock);
 		colorBlock = clipValuesBeyondRange(colorBlock);
@@ -252,19 +230,13 @@ public class DWTServiceImpl implements DWTService {
 				BufferedImage.TYPE_INT_RGB);
 		for (int y = 0; y < outputImage.getHeight(); y++) {
 			for (int x = 0; x < outputImage.getWidth(); x++) {
-				int pix = getPixel((int) Math.floor(decodedBlock[0][y][x]), (int) Math.floor(decodedBlock[1][y][x]),
+				int pix = CompressionUtil.getPixel((int) Math.floor(decodedBlock[0][y][x]),
+						(int) Math.floor(decodedBlock[1][y][x]),
 						(int) Math.floor(decodedBlock[2][y][x]));
-
-				if (decodedBlock[0][y][x] < 0 || decodedBlock[1][y][x] < 0 || decodedBlock[2][y][x] < 0) {
-					System.out.println(decodedBlock[0][y][x] +" "+decodedBlock[1][y][x]+" "+decodedBlock[2][y][x]);
-				}
 				outputImage.setRGB(x, y, pix);
 			}
 		}
 		return outputImage;
 	}
 
-	private static int getPixel(int red, int green, int blue) {
-		return 0xff000000 | ((red & 0xff) << 16) | ((green & 0xff) << 8) | (blue & 0xff);
-	}
 }

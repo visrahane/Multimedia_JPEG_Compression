@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.vis.models.InputModel;
 import com.vis.services.DWTServiceImpl;
+import com.vis.util.CompressionUtil;
 
 /**
  * @author Vis
@@ -23,7 +24,7 @@ public class DWTServiceImplTest {
 			{ { 10, 20, 30, 40 }, { 10, 20, 30, 40 }, { 10, 20, 30, 40 }, { 10, 20, 30, 40 } },
 			{ { 10, 20, 30, 40 }, { 10, 20, 30, 40 }, { 10, 20, 30, 40 }, { 10, 20, 30, 40 } } };
 			float expectedBlock[][][] = new float[3][4][4];
-			dwtService.clone3DArray(colorBlock, expectedBlock);
+			CompressionUtil.clone3DArray(colorBlock, expectedBlock);
 			colorBlock = dwtService.encodeBlock(colorBlock);
 			colorBlock =dwtService.decodeBlock(colorBlock);
 			Assert.assertArrayEquals(colorBlock, expectedBlock);

@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 
 import com.vis.models.InputModel;
 import com.vis.readers.ImageReader;
+import com.vis.services.DCTService;
+import com.vis.services.DCTServiceImpl;
 import com.vis.services.DWTService;
 import com.vis.services.DWTServiceImpl;
 
@@ -28,13 +30,16 @@ public class Starter {
 		InputModel inputModel = getInput(args);
 		BufferedImage inputImg = ImageReader.readRGBImage(inputModel);
 		DWTService dwtService = new DWTServiceImpl();
-		float[][][] encodedBlock=dwtService.encodeViaDWT(inputImg,inputModel);
-		float[][][] decodedBlock = dwtService.decodeViaDWT(encodedBlock, inputModel);
+		float[][][] encodedBlock=dwtService.encode(inputImg,inputModel);
+		float[][][] decodedBlock = dwtService.decode(encodedBlock, inputModel);
 		BufferedImage dwtOutput = dwtService.getDecodedImage(decodedBlock);
-		// Use a panel and label to display the image
+		DCTService dctService = new DCTServiceImpl();
+		float[][][][] encodedDCTBlock = dctService.encode(inputImg, inputModel);
+		float[][][][] decodedDCTBlock = dctService.decode(encodedDCTBlock, inputModel);
+		BufferedImage dctOutput = dctService.getDecodedImage(decodedDCTBlock);
 		displayImage(inputImg);
+		displayImage(dctOutput);
 		displayImage(dwtOutput);
-
 	}
 
 	private static void displayImage(BufferedImage img) {
