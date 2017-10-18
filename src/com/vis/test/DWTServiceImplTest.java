@@ -123,7 +123,7 @@ public class DWTServiceImplTest {
 			{ { 1, 2, 3, 4 }, { 5, 6, 7, 8 }, { 9, 10, 11, 12 }, { 13, 14, 15, 16 } } };
 
 			DWTServiceImpl dwtService = new DWTServiceImpl();
-			colorBlock = dwtService.updateCoefficients(colorBlock, 8);
+			colorBlock = dwtService.getCoefficientsInZigzagOrder(colorBlock, 8);
 			float[][][] expectedBlock = { { { 1, 2, 3, 4 }, { 5, 6, 7, 0 }, { 9, 0, 0, 0 }, { 0, 0, 0, 0 } },
 					{ { 1, 2, 3, 4 }, { 5, 6, 7, 0 }, { 9, 0, 0, 0 }, { 0, 0, 0, 0 } },
 					{ { 1, 2, 3, 4 }, { 5, 6, 7, 0 }, { 9, 0, 0, 0 }, { 0, 0, 0, 0 } } };

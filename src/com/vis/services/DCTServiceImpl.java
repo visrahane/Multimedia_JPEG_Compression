@@ -17,7 +17,6 @@ public class DCTServiceImpl implements DCTService {
 	@Override
 	public float[][][][] encode(BufferedImage inputImg, InputModel inputModel) {
 		float[][][][] colorBlock = CompressionUtil.prepare8x8Blocks(inputImg);
-		// TODO remove this
 		colorBlock = encodeBlock(colorBlock);
 		colorBlock = updateCoefficients(colorBlock, inputModel.getNoOfCoefficient());
 		return colorBlock;
@@ -84,35 +83,38 @@ public class DCTServiceImpl implements DCTService {
 
 		for (int i = 0; i < input[0].length; i++)// for each block
 		{
-			for (int j = 0; j < input[0][0].length; j++) { // for each row of
-				// block
-
-				for (int k = 0; k < input[0][0][0].length; k++) { // for each
-					// col
+			for (int u = 0; u < input[0][0].length; u++) { // for each row of block
+				for (int v = 0; v < input[0][0][0].length; v++) { // for each col
 					float sum[] = new float[3];
 					// perform dct
 					for (int c = 0; c < 3; c++) {
 						for (int x = 0; x < input[0][0].length; x++) {
 							for (int y = 0; y < input[0][0][0].length; y++) {
-								sum[c] += (float) (input[c][i][x][y] * Math.cos((2 * x + 1) * j * Math.PI / 16)
-										* Math.cos((2 * y + 1) * k * Math.PI / 16));
-
+								sum[c] += (float) ((input[c][i][x][y])
+										* Math.cos((2 * x + 1) * u * Math.PI * 0.0625)
+										* Math.cos((2 * y + 1) * v * Math.PI * 0.0625));
+								// System.out.print("Sum:" + sum[0] + " ");
 							}
 						}
 					}
+					// System.out.println();
 					// for each color
 					for (int c = 0; c < 3; c++) {
-						if (j == 0 && k == 0) {
-							dctProcessedBlock[c][i][j][k] = ((float) 1 / 8) * sum[c];
-						} else {
-							dctProcessedBlock[c][i][j][k] = ((float) 1 / 4) * sum[c];
+						if (u == 0 ) {
+							sum[c]= (float) ((1 / Math.sqrt(2)) * sum[c]);
+						} 
+						if(v==0) {
+							sum[c]= (float) ((1 / Math.sqrt(2)) * sum[c]);
+							
 						}
+						dctProcessedBlock[c][i][u][v] = ((float) 1 / 4) * sum[c];
 
 					}
 				}
 
 
 			}
+
 		}
 
 
@@ -147,32 +149,37 @@ public class DCTServiceImpl implements DCTService {
 
 	}
 
-	private float[][][][] decodeBlock(float[][][][] encodedBlock) {
+	public float[][][][] decodeBlock(float[][][][] encodedBlock) {
 
 		// run reverse dct
 		float[][][][] dctProcessedBlock = new float[3][encodedBlock[0].length][encodedBlock[0][0].length][encodedBlock[0][0][0].length];
 
 		for (int i = 0; i < encodedBlock[0].length; i++)// for each block
 		{
-			for (int j = 0; j < encodedBlock[0][0].length; j++) { //for each row of block
+			for (int x = 0; x < encodedBlock[0][0].length; x++) { //for each row of block
 
-				for (int k = 0; k < encodedBlock[0][0][0].length; k++) { // for each col
+				for (int y = 0; y < encodedBlock[0][0][0].length; y++) { // for each col
 					float sum[] = new float[3];
 					// perform reverse dct
 					for (int c = 0; c < 3; c++) {
-						for (int x = 0; x < encodedBlock[0][0].length; x++) {
-							for (int y = 0; y < encodedBlock[0][0][0].length; y++) {
-								sum[c] += (float) (encodedBlock[c][i][x][y] * (Math.cos((2 * x + 1) * j * Math.PI / 16)
-										* (Math.cos((2 * y + 1) * k * Math.PI / 16))));
-								if (j == 0 && k == 0) {
-									sum[c]/=2;
+						for (int u = 0; u < encodedBlock[0][0].length; u++) {
+							for (int v = 0; v < encodedBlock[0][0][0].length; v++) {
+								float temp= (float) (encodedBlock[c][i][u][v]
+										* (Math.cos((2 * x + 1) * u * Math.PI * 0.0625)
+												* (Math.cos((2 * y + 1) * v * Math.PI * 0.0625))));
+								if (u == 0 ) {
+									temp /= Math.sqrt(2);
 								}
+								if(v==0){
+									temp /= Math.sqrt(2);
+								}
+								sum[c]+=temp;
 							}
 						}
 					}
 					// for each color
 					for (int c = 0; c < 3; c++) {
-						dctProcessedBlock[c][i][j][k] = ((float) 1 / 4) * sum[c];
+						dctProcessedBlock[c][i][x][y] = ((float) 1 / 4) * sum[c];
 					}
 
 
@@ -197,9 +204,9 @@ public class DCTServiceImpl implements DCTService {
 				for (int k = 0; k < decodedBlock[0][0][0].length; k++) {
 					int pix = CompressionUtil.getPixel((int) Math.floor(decodedBlock[0][i][j][k]),
 							(int) Math.floor(decodedBlock[1][i][j][k]), (int) Math.floor(decodedBlock[2][i][j][k]));
-					// System.out.println(x);
 					int x = (i % 64) * 8 + k;
 					int y = ((int) (Math.floor(i / 64))) * 8 + j;
+					//System.out.println("i-" + i + " j-" + j + " k-" + k + "x-" + x + " y-" + y + " pix-" + pix);
 					outputImage.setRGB(x, y, pix);
 				}
 

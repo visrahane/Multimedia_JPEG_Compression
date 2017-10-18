@@ -19,7 +19,7 @@ public class DCTServiceImplTest {
 	@Test
 	public void testEncode() {
 		DCTServiceImpl dctService = new DCTServiceImpl();
-		float[][][][] expectedBlock = new float[3][1][8][8];
+		float[][][][] expectedBlock = new float[1][1][8][8];
 		float[][][][] colorBlock = new float[][][][] {
 			{
 				{
@@ -60,8 +60,9 @@ public class DCTServiceImplTest {
 				}
 			}
 		};
-		byte[][][][] input = getByteArray(colorBlock);
+		// byte[][][][] input = getByteArray(colorBlock);
 		colorBlock = dctService.encodeBlock(colorBlock);
+		colorBlock = dctService.decodeBlock(colorBlock);
 		Assert.assertArrayEquals(expectedBlock, colorBlock);
 	}
 
@@ -116,7 +117,7 @@ public class DCTServiceImplTest {
 				{ 162f, 162f, 161f, 161f, 163f, 158f, 158f, 158f } } } };
 
 				DCTServiceImpl dctService = new DCTServiceImpl();
-		colorBlock = dctService.updateCoefficients(colorBlock, 58);
+				colorBlock = dctService.updateCoefficients(colorBlock, 58);
 				float[][][][] expectedBlock = { { {
 
 					{ 139f, 144f, 149f, 153f, 155f, 155f, 155f, 155f },

@@ -19,4 +19,6 @@ public interface DWTService {
 	float[][][] decode(float[][][] colorMatrix, InputModel inputModel);
 
 	BufferedImage getDecodedImage(float[][][] decodedBlock);
+
+	float[][][] getCoefficientsInZigzagOrder(float[][][] encodedBlock, int noOfCoefficient);
 }

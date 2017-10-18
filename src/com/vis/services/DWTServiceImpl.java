@@ -18,11 +18,11 @@ public class DWTServiceImpl implements DWTService {
 	public float[][][] encode(BufferedImage inputImg, InputModel inputModel) {
 		float[][][] colorBlock = CompressionUtil.prepareColorBlock(inputImg);
 		colorBlock = encodeBlock(colorBlock);
-		colorBlock = updateCoefficients(colorBlock, inputModel.getNoOfCoefficient());
 		return colorBlock;
 	}
 
-	public float[][][] updateCoefficients(float[][][] colorBlock, int coeff) {
+	@Override
+	public float[][][] getCoefficientsInZigzagOrder(float[][][] colorBlock, int coeff) {
 		float[][][] processedBlock = new float[3][colorBlock[0].length][colorBlock[0][0].length];
 		for (int l = 0, count; l < 3; l++) {
 			count = 1;
