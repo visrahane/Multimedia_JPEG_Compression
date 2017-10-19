@@ -19,8 +19,8 @@ public class DCTServiceImplTest {
 	@Test
 	public void testEncode() {
 		DCTServiceImpl dctService = new DCTServiceImpl();
-		float[][][][] expectedBlock = new float[1][1][8][8];
-		float[][][][] colorBlock = new float[][][][] {
+		float[][][][] expectedBlock = new float[][][][]{
+
 			{
 				{
 
@@ -59,13 +59,43 @@ public class DCTServiceImplTest {
 					{ 162f, 162f, 161f, 161f, 163f, 158f, 158f, 158f }
 				}
 			}
+
 		};
-		// byte[][][][] input = getByteArray(colorBlock);
+
+		float[][][][] colorBlock = new float[3][1][8][8];
+		copyArray(expectedBlock, colorBlock);
 		colorBlock = dctService.encodeBlock(colorBlock);
 		colorBlock = dctService.decodeBlock(colorBlock);
+		roundValuesToTest(colorBlock);
 		Assert.assertArrayEquals(expectedBlock, colorBlock);
 	}
 
+
+	private void roundValuesToTest(float[][][][] colorBlock) {
+		for (int i = 0; i < colorBlock.length; i++) {
+			for (int j = 0; j < colorBlock[0].length; j++) {
+				for (int x = 0; x < colorBlock[0][0].length; x++) {
+					for (int y = 0; y < colorBlock[0][0][0].length; y++) {
+						colorBlock[i][j][x][y] = Math.round(colorBlock[i][j][x][y]);
+					}
+				}
+			}
+		}
+
+	}
+
+	private void copyArray(float[][][][] copyOf, float[][][][] copyInto) {
+		for (int i = 0; i < copyOf.length; i++) {
+			for (int j = 0; j < copyOf[0].length; j++) {
+				for (int x = 0; x < copyOf[0][0].length; x++) {
+					for (int y = 0; y < copyOf[0][0][0].length; y++) {
+						copyInto[i][j][x][y] = copyOf[i][j][x][y];
+					}
+				}
+			}
+		}
+
+	}
 
 	private byte[][][][] getByteArray(float[][][][] colorBlock) {
 		byte[][][][] input = new byte[3][1][8][8];
@@ -117,7 +147,7 @@ public class DCTServiceImplTest {
 				{ 162f, 162f, 161f, 161f, 163f, 158f, 158f, 158f } } } };
 
 				DCTServiceImpl dctService = new DCTServiceImpl();
-				colorBlock = dctService.updateCoefficients(colorBlock, 58);
+				colorBlock = dctService.getCoefficientsInZigZagOrder(colorBlock, 58);
 				float[][][][] expectedBlock = { { {
 
 					{ 139f, 144f, 149f, 153f, 155f, 155f, 155f, 155f },

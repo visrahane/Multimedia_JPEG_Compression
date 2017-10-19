@@ -17,4 +17,6 @@ public interface DCTService {
 	float[][][][] decode(float[][][][] encodedBlock, InputModel inputModel);
 
 	BufferedImage getDecodedImage(float[][][][] decodedBlock);
+
+	float[][][][] getCoefficientsInZigZagOrder(float[][][][] colorBlock, int coeff);
 }

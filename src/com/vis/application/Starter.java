@@ -30,45 +30,44 @@ public class Starter {
 		inputDisplayService.displayImage(inputImg);
 
 		if (CompressionConstants.PROGRESSIVE_SCANNING == inputModel.getNoOfCoefficient()) {
-			runProgressiveScanning(inputModel, inputImg);
+			runScanning(inputModel, inputImg, 4096, 512 * 512);
 		} else {
-			runNormalScanning(inputModel, inputImg);
+			runScanning(inputModel, inputImg, inputModel.getNoOfCoefficient(), inputModel.getNoOfCoefficient());
 		}
 
 	}
 
-	private static void runNormalScanning(InputModel inputModel, BufferedImage inputImg) {
-		DWTService dwtService = new DWTServiceImpl();
+	private static void runScanning(InputModel inputModel, BufferedImage inputImg, int initialNoOfCoeff,
+			int noOfCoeff) {
+		runDWT(inputModel, inputImg, initialNoOfCoeff, noOfCoeff);
 
-		float[][][] encodedBlock = dwtService.encode(inputImg, inputModel);
-		encodedBlock = dwtService.getCoefficientsInZigzagOrder(encodedBlock, inputModel.getNoOfCoefficient());
-		float[][][] decodedBlock = dwtService.decode(encodedBlock, inputModel);
-
-		BufferedImage dwtOutput = dwtService.getDecodedImage(decodedBlock);
-		ImageDisplayService outputDisplayService = new ImageDisplayService("Output Image");
-		outputDisplayService.displayImage(dwtOutput);
-
-		runDCT(inputModel, inputImg);
+		runDCT(inputModel, inputImg, initialNoOfCoeff, noOfCoeff);
 
 	}
 
-
-	private static void runDCT(InputModel inputModel, BufferedImage inputImg) {
+	private static void runDCT(InputModel inputModel, BufferedImage inputImg, int initialNoOfCoeff, int noOfCoeff) {
 		DCTService dctService = new DCTServiceImpl();
+		ImageDisplayService outputDisplayService = new ImageDisplayService("DCT Output Image");
+
 		float[][][][] encodedDCTBlock = dctService.encode(inputImg, inputModel);
-		float[][][][] decodedDCTBlock = dctService.decode(encodedDCTBlock, inputModel);
-		BufferedImage dctOutput = dctService.getDecodedImage(decodedDCTBlock);
-		ImageDisplayService outputDisplayService = new ImageDisplayService("Output Image");
-		outputDisplayService.displayImage(dctOutput);
+		float[][][][] processedDCTBlock = new float[3][encodedDCTBlock.length][encodedDCTBlock[0].length][encodedDCTBlock[0][0].length];
+		for (int i = initialNoOfCoeff; i <= noOfCoeff;) {
+			processedDCTBlock = dctService.getCoefficientsInZigZagOrder(encodedDCTBlock, i);
+			float[][][][] decodedDCTBlock = dctService.decode(processedDCTBlock, inputModel);
+			BufferedImage dctOutput = dctService.getDecodedImage(decodedDCTBlock);
+			outputDisplayService.displayImage(dctOutput);
+			i *= 2;
+		}
 	}
 
-	private static void runProgressiveScanning(InputModel inputModel, BufferedImage inputImg) {
+	private static void runDWT(InputModel inputModel, BufferedImage inputImg, int initialNoOfCoeff,
+			int noOfCoeff) {
 		DWTService dwtService = new DWTServiceImpl();
-		ImageDisplayService outputDisplayService = new ImageDisplayService("Output Image");
+		ImageDisplayService outputDisplayService = new ImageDisplayService("DWT Output Image");
 
 		float[][][] encodedBlock = dwtService.encode(inputImg, inputModel);
 		float[][][] processedBlock = new float[3][encodedBlock.length][encodedBlock[0].length];
-		for (int i = 4096, j = 0; i <= inputModel.getHeight() * inputModel.getWidth(); j++) {
+		for (int i = initialNoOfCoeff; i <= noOfCoeff;) {
 			processedBlock = dwtService.getCoefficientsInZigzagOrder(encodedBlock, i);
 			float[][][] decodedBlock = dwtService.decode(processedBlock, inputModel);
 			BufferedImage dwtOutput = dwtService.getDecodedImage(decodedBlock);
@@ -81,9 +80,6 @@ public class Starter {
 			outputDisplayService.displayImage(dwtOutput);
 			i *= 2;
 		}
-
-		// runDCT(inputModel, inputImg);
-
 	}
 
 	private static InputModel getInput(String[] args) {

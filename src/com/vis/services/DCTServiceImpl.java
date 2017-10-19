@@ -18,11 +18,11 @@ public class DCTServiceImpl implements DCTService {
 	public float[][][][] encode(BufferedImage inputImg, InputModel inputModel) {
 		float[][][][] colorBlock = CompressionUtil.prepare8x8Blocks(inputImg);
 		colorBlock = encodeBlock(colorBlock);
-		colorBlock = updateCoefficients(colorBlock, inputModel.getNoOfCoefficient());
 		return colorBlock;
 	}
 
-	public float[][][][] updateCoefficients(float[][][][] colorBlock, int coeff) {
+	@Override
+	public float[][][][] getCoefficientsInZigZagOrder(float[][][][] colorBlock, int coeff) {
 		float[][][][] processedBlock = new float[3][colorBlock[0].length][colorBlock[0][0].length][colorBlock[0][0][0].length];
 		coeff = Math.round(coeff / colorBlock[0].length);
 		for (int l = 0, count; l < 3; l++) {
@@ -93,19 +93,17 @@ public class DCTServiceImpl implements DCTService {
 								sum[c] += (float) ((input[c][i][x][y])
 										* Math.cos((2 * x + 1) * u * Math.PI * 0.0625)
 										* Math.cos((2 * y + 1) * v * Math.PI * 0.0625));
-								// System.out.print("Sum:" + sum[0] + " ");
 							}
 						}
 					}
-					// System.out.println();
 					// for each color
 					for (int c = 0; c < 3; c++) {
 						if (u == 0 ) {
 							sum[c]= (float) ((1 / Math.sqrt(2)) * sum[c]);
-						} 
+						}
 						if(v==0) {
 							sum[c]= (float) ((1 / Math.sqrt(2)) * sum[c]);
-							
+
 						}
 						dctProcessedBlock[c][i][u][v] = ((float) 1 / 4) * sum[c];
 
