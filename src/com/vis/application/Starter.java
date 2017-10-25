@@ -35,6 +35,8 @@ public class Starter {
 			runScanning(inputModel, inputImg, inputModel.getNoOfCoefficient(), inputModel.getNoOfCoefficient());
 		}
 
+		System.out.println("DONE");
+
 	}
 
 	private static void runScanning(InputModel inputModel, BufferedImage inputImg, int initialNoOfCoeff,
@@ -72,7 +74,7 @@ public class Starter {
 			float[][][] decodedBlock = dwtService.decode(processedBlock, inputModel);
 			BufferedImage dwtOutput = dwtService.getDecodedImage(decodedBlock);
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
